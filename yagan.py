@@ -153,17 +153,9 @@ l1 = 8700
 n1 = 1470000
 xik1 = 0.825  # 钢号修正系数,Q235=1, Q345=0.825
 fy1 = 345
-# 水平撑杆参数
-type2 = 2
-d2 = 250
-t2 = 10
-l2 = 10400
-n2 = 730000
-xik2 = 0.825  # 钢号修正系数,Q235=1, Q345=0.825
-fy2 = 345
 # 许用参数
 lam = 150
-f = 310
+fp = 310
 
 # b类截面轴向受压结构的稳定系数1-149范围
 psi = [1, 1, 1, 0.999, 0.999, 0.998, 0.997, 0.996, 0.995, 0.994,
@@ -183,23 +175,22 @@ psi = [1, 1, 1, 0.999, 0.999, 0.998, 0.997, 0.996, 0.995, 0.994,
        0.344, 0.340, 0.337, 0.333, 0.329, 0.325, 0.322, 0.318, 0.314, 0.311
        ]
 
-
-def psib(lam, fy):
-    a1 = 0.65
-    a2 = 0.965
-    a3 = 0.3
-    es = 210000  # 钢材的弹性模量MPa
-    lamn = ((fy / es) ** 0.5) * lam / pi
-    if lamn > 0.215:
-        return ((a2 + a3 * lamn + (lamn ** 2)) - (((a2 + a3 * lamn + (lamn ** 2)) ** 2 - 4 * (lamn ** 2)) ** 0.5)) / (
-                2 * (lamn ** 2))
-    else:
-        return 1 - a1 * (lamn ** 2)
+# def psib(lam, fy):  # 公式计算压杆稳定系数
+#     a1 = 0.65
+#     a2 = 0.965
+#     a3 = 0.3
+#     es = 210000  # 钢材的弹性模量MPa
+#     lamn = ((fy / es) ** 0.5) * lam / pi
+#     if lamn > 0.215:
+#         return ((a2 + a3 * lamn + (lamn ** 2)) - (((a2 + a3 * lamn + (lamn ** 2)) ** 2 - 4 * (lamn ** 2)) ** 0.5)) / (
+#                 2 * (lamn ** 2))
+#     else:
+#         return 1 - a1 * (lamn ** 2)
 
 
 calc_book.add_heading('五、杆件稳定性校核', level=1)
-calc_book.add_heading('5.1.竖向撑杆校核', level=2)
-if type1 == 1:
+# calc_book.add_heading('5.1.竖向撑杆校核', level=2)
+if type1 == 1:  # 截面属性，1为圆管，2为方管
     calc_book.add_paragraph(f'杆件截面为圆管：直径{d1}mm, 壁厚{t1}mm, 材质：Q345B', style='Normal')
     calc_book.add_paragraph('截面属性：', style='Normal')
     gxj = pi * ((d1 ** 4) - ((d1 - 2 * t1) ** 4)) / 64
@@ -208,40 +199,61 @@ if type1 == 1:
     mass = mj * 1000 * 7850 * (10 ** (-9))
     lambda1 = l1 / hzbj
     sigma1 = n1 / mj
-    mathtemp = r'I = ' + str(ceil(gxj)) + r'(mm^4)'
+    mathtemp = r'I = ' + str(round(gxj, 0)) + r'(mm^4)'
     width = add_image(mathtemp, 'gxj')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/gxj.png', width=Inches(width))
-    mathtemp = r'i_x = ' + str(ceil(hzbj)) + r'(mm)'
+    mathtemp = r'i_x = ' + str(round(hzbj, 1)) + r'(mm)'
     width = add_image(mathtemp, 'hzbj')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/hzbj.png', width=Inches(width))
-    mathtemp = r'A = ' + str(ceil(mj)) + r'(mm^2)'
+    mathtemp = r'A = ' + str(round(mj, 1)) + r'(mm^2)'
     width = add_image(mathtemp, 'mj')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mj.png', width=Inches(width))
     calc_book.add_paragraph(f'计算长度：L={l1}(mm)', style='Normal')
     calc_book.add_paragraph(f'由前章节计算结果得最大轴向压力为：N={n1}(N)', style='Normal')
     calc_book.add_paragraph('长细比：', style='Normal')
+
     if lambda1 <= 150:
-        mathtemp = r'\lambda = \frac{L}{i_x} = ' + str(ceil(lambda1)) + r'\leq [\lambda] = 150'
+        mathtemp = r'\lambda = \frac{L}{i_x} = ' + str(ceil(lambda1)) + r'\leq [\lambda] =' + f'{lam}'
         width = add_image(mathtemp, 'lambda1')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lambda1.png',
                                                                                 width=Inches(width))
         calc_book.add_paragraph('满足规范。', style='Quote')
     else:
-        mathtemp = r'\lambda = \frac{L}{i_x} = ' + str(ceil(lambda1)) + r'> [\lambda] = 150'
+        mathtemp = r'\lambda = \frac{L}{i_x} = ' + str(ceil(lambda1)) + r'> [\lambda]  =' + f'{lam}'
         width = add_image(mathtemp, 'lambda1')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lambda1.png',
                                                                                 width=Inches(width))
         calc_book.add_paragraph('', style='Quote').add_run('不满足规范要求。').font.color.rgb = RGBColor(0xff, 0x00, 0x00)
+
     calc_book.add_paragraph('查表得稳定系数：', style='Normal')
     mathtemp = r'\psi = ' + str(psi[ceil(lambda1 / xik1)])
     width = add_image(mathtemp, 'psi')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/psi.png',
                                                                             width=Inches(width))
-    calc_book.add_paragraph('用公式得稳定系数：', style='Normal')
-    mathtemp = r'\psi = ' + str(psib(lambda1, fy1))
-    width = add_image(mathtemp, 'psi1')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/psi1.png',
+    # calc_book.add_paragraph('用公式得稳定系数：', style='Normal')
+    # mathtemp = r'\psi = ' + str(psib(lambda1, fy1))
+    # width = add_image(mathtemp, 'psi1')
+    # calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/psi1.png',
+    #                                                                         width=Inches(width))
+    calc_book.add_paragraph('轴向应力：', style='Normal')
+    mathtemp = r'\sigma = \frac{N}{A} =' + str(round(n1 / mj, 1)) + r'(MPa)'
+    width = add_image(mathtemp, 'sigma')
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/sigma.png',
                                                                             width=Inches(width))
+    calc_book.add_paragraph('稳定性：', style='Normal')
+    sigma2 = n1 / (psi[ceil(lambda1 / xik1)] * mj)
+    if sigma2 < fp:
+        mathtemp = r'\frac{N}{\psi A} =' + str(round(sigma2, 1)) + r'(MPa) < f =' + f'{fp}(MPa)'
+        width = add_image(mathtemp, 'sigma2')
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/sigma2.png',
+                                                                                width=Inches(width))
+        calc_book.add_paragraph('满足规范。', style='Quote')
+    else:
+        mathtemp = r'\frac{N}{\psi A} =' + str(round(sigma2, 1)) + r'(MPa) > f =' + f'{fp}(MPa)'
+        width = add_image(mathtemp, 'sigma2')
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/sigma2.png',
+                                                                                width=Inches(width))
+        calc_book.add_paragraph('', style='Quote').add_run('不满足规范要求。').font.color.rgb = RGBColor(0xff, 0x00, 0x00)
 
 '''
 计算书结束，输出docx文档
