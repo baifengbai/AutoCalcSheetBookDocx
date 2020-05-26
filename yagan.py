@@ -268,12 +268,12 @@ if type1 == 1:  # 截面属性，1为圆管，2为方管
 else:  # 方管截面校核
     calc_book.add_paragraph(f'杆件截面为方管：边长{d1}mm, 壁厚{t1}mm, 材质：Q345B', style='Normal')
     calc_book.add_paragraph('截面属性：', style='Normal')
-    gxj = ((d1 ** 4) - ((d1 - 2 * t1) ** 4)) / 12;
-    mj = (d1 ** 2) - ((d1 - 2 * t1) ** 2);
-    hzbj = (gxj / mj) ** 0.5;
-    mass = mj * 1000 * 7850 * (10 ** (-9));
-    lambda1 = l1 / hzbj;
-    sigma1 = n1 / mj;
+    gxj = ((d1 ** 4) - ((d1 - 2 * t1) ** 4)) / 12
+    mj = (d1 ** 2) - ((d1 - 2 * t1) ** 2)
+    hzbj = (gxj / mj) ** 0.5
+    mass = mj * 1000 * 7850 * (10 ** (-9))
+    lambda1 = l1 / hzbj
+    sigma1 = n1 / mj
     mathtemp = r'I = ' + str(round(gxj, 0)) + r'(mm^4)'
     width = add_image(mathtemp, 'gxj')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/gxj.png', width=Inches(width))
