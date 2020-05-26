@@ -40,7 +40,7 @@ def add_image(latex, pngname):
 
 
 print('杆件稳定性校核自动生成word初始版')
-print('')
+print('[不计算杆件自重产生的弯矩]')
 print('20200525 by 徐明')
 print('')
 
