@@ -1,21 +1,21 @@
 from docx import Document
-from docx.shared import Inches
+# from docx.shared import Inches
 from docx.shared import Pt
 from docx.shared import Mm
 from docx.shared import Cm
 from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-import urllib.parse
-import urllib.request
-from PIL import Image
+# import urllib.parse
+# import urllib.request
+# from PIL import Image
 from time import strftime
 from time import localtime
 from datetime import datetime
 from docx.enum.text import WD_LINE_SPACING
 from math import ceil
-from os import mkdir
-from os.path import exists
+# from os import mkdir
+# from os.path import exists
 import pandas as pd
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
