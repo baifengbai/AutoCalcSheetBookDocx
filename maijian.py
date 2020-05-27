@@ -349,26 +349,26 @@ width = add_image(mathtemp, 'ab')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ab.png', width=Inches(width))
 
 if ny >= 0:  # 受拉工况校核
-    if mx < 0.4 * ny * zz:
-        calc_book.add_paragraph('根据规范', style='Normal')
-        mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz1')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
-        calc_book.add_paragraph('取', style='Normal')
-        mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz2')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
-        mx = 0.4 * ny * zz
-    if mz < 0.4 * ny * zx:
-        calc_book.add_paragraph('根据规范', style='Normal')
-        mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz3')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.png', width=Inches(width))
-        calc_book.add_paragraph('取', style='Normal')
-        mathtemp = r'M_z = 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz4')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
-        mz = 0.4 * ny * zx
+    # if mx < 0.4 * ny * zz:   # 受拉工况不需要此步骤
+    #     calc_book.add_paragraph('根据规范', style='Normal')
+    #     mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz1')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
+    #     calc_book.add_paragraph('取', style='Normal')
+    #     mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz2')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
+    #     mx = 0.4 * ny * zz
+    # if mz < 0.4 * ny * zx:
+    #     calc_book.add_paragraph('根据规范', style='Normal')
+    #     mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz3')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.png', width=Inches(width))
+    #     calc_book.add_paragraph('取', style='Normal')
+    #     mathtemp = r'M_z = 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz4')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
+    #     mz = 0.4 * ny * zx
     as1 = vx / (ar * av * fy) + vz / (ar * av * fy) + ny / (0.8 * ab * fy) + mx / (1.3 * ar * ab * fy * zz) + mz / (
             1.3 * ar * ab * fy * zx)
     as2 = ny / (0.8 * ab * fy) + mx / (0.4 * ar * ab * fy * zz) + mz / (0.4 * ar * ab * fy * zx)
