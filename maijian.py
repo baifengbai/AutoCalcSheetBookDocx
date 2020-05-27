@@ -270,8 +270,8 @@ if vz > 0:
     width = add_image(mathtemp, 'vz')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/vz.png', width=Inches(width))
     calc_book.add_paragraph(f'沿z向剪力作用方向最外层锚筋中心线之间的距离：{zz}mm', style='Normal')
-
-calc_book.add_paragraph(f'剪力作用点距离锚板平面的距离：L={vl}mm', style='Normal')
+if vl > 0:
+    calc_book.add_paragraph(f'剪力作用点距离锚板平面的距离：L={vl}mm', style='Normal')
 if vx > 0:
     calc_book.add_paragraph('x向剪力产生的弯矩：', style='Normal')
     mathtemp = r'M_z = V_x L =' + str(mz) + r'(N \cdot mm)'
@@ -405,6 +405,9 @@ if ny < 0:  # 受压工况校核
         width = add_image(mathtemp, 'mnz2')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
         mx = 0.4 * ny * zz
+    if mx == 0:
+        mx = 0.4 * ny * zz
+
     if 0 < mz < 0.4 * ny * zx:
         calc_book.add_paragraph('根据规范', style='Normal')
         mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
@@ -415,13 +418,13 @@ if ny < 0:  # 受压工况校核
         width = add_image(mathtemp, 'mnz4')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
         mz = 0.4 * ny * zx
+    if mz == 0:
+        mz = 0.4 * ny * zx
 
     if vx == 0:
         vx = 0.3 * ny
-        mz = 0.4 * ny * zx
     if vz == 0:
         vz = 0.3 * ny
-        mx = 0.4 * ny * zz
 
     as3 = (vx - 0.3 * ny) / (ar * av * fy) + (vz - 0.3 * ny) / (ar * av * fy) + (mx - 0.4 * ny * zz) / (
             1.3 * ar * ab * fy * zz) + (mz - 0.4 * ny * zx) / (1.3 * ar * ab * fy * zx)
@@ -482,4 +485,4 @@ print('……')
 filename = '埋件校核' + strftime("%Y-%m-%d-%H%M%S", localtime())
 calc_book.save(f'{filename}.docx')
 print(f'计算书生成结束，保存在程序目录下，文件名为{filename}.docx')
-input('按回车键退出......')
+# input('按回车键退出......')
