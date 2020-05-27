@@ -193,7 +193,12 @@ for i in range(1, 9):
     tabindex = tabindex + 22  # 关键
 
 calc_book.add_heading(f'{titlist}.9.节点反力汇总', level=3)
-
+# 创建表格
+rows_num = 64
+cols_num = 4
+table = calc_book.add_table(rows=rows_num, cols=cols_num, style='Table Grid')
+for r in range(8):
+    table.cell(0+r*8,1).text=f'工况-{r+1}'
 
 
 '''
