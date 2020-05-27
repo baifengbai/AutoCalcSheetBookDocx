@@ -219,8 +219,8 @@ while True:
     except ValueError:
         print("输入错误，请输入正确数据[整数]")
 # ny = 1618000  # 法向拉力（正）或法向压力（负），单位N
-zx = mjjj * xrow  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
-zz = mjjj * zrow  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zx = mjjj * (xrow - 1)  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zz = mjjj * (zrow - 1)  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
 row = max(xrow, zrow)  # 锚筋排数取大值
 while True:
     try:
@@ -251,7 +251,7 @@ if av > 0.7:  # 根据规范大于0.7时取0.7
 ab = 0.6 + 0.25 * mbt / d  # 锚板的弯曲变形折减系数
 mjas = mjnums * 3.14 * ((d / 2) ** 2)  # 锚筋的总面积
 
-calc_book.add_heading('1. 埋件校核', level=1)
+# calc_book.add_heading('1. 埋件校核', level=1)
 calc_book.add_paragraph('计算依据：GB50010-2010混凝土设计规范(2015年版)', style='Normal')
 calc_book.add_paragraph(f'锚筋规格：{mj} 数量：{mjnums}', style='Normal')
 calc_book.add_paragraph(f'锚板规格：t{mbt}mm×{mbh}mm×{mbw}mm/Q345B', style='Normal')
