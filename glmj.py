@@ -224,8 +224,8 @@ while True:
     except ValueError:
         print("输入错误，请输入正确数据[整数]")
 # ny = 1618000  # 法向拉力（正）或法向压力（负），单位N
-zx = mjjj * xrow  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
-zz = mjjj * zrow  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zx = mjjj * (xrow - 1)  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zz = mjjj * (zrow - 1)  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
 row = max(xrow, zrow)  # 锚筋排数取大值
 while True:
     try:
@@ -354,16 +354,16 @@ width = add_image(mathtemp, 'ab')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ab.png', width=Inches(width))
 
 if ny >= 0:  # 受拉工况校核
-    if 0.4 * ny * zz > mx > 0:
-        calc_book.add_paragraph('根据规范', style='Normal')
-        mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz1')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
-        calc_book.add_paragraph('取', style='Normal')
-        mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
-        width = add_image(mathtemp, 'mnz2')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
-        mx = 0.4 * ny * zz
+    # if 0.4 * ny * zz > mx > 0:
+    #     calc_book.add_paragraph('根据规范', style='Normal')
+    #     mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz1')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
+    #     calc_book.add_paragraph('取', style='Normal')
+    #     mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
+    #     width = add_image(mathtemp, 'mnz2')
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
+    #     mx = 0.4 * ny * zz
     # if 0.4 * ny * zx > mz > 0:
     #     calc_book.add_paragraph('根据规范', style='Normal')
     #     mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
@@ -425,6 +425,14 @@ if ny < 0:  # 受压工况校核
     # as3 = (vx - 0.3 * ny) / (ar * av * fy) + (vz - 0.3 * ny) / (ar * av * fy) + (mx - 0.4 * ny * zz) / (28
     #         1.3 * ar * ab * fy * zz) + (mz - 0.4 * ny * zx) / (1.3 * ar * ab * fy * zx)
     # as4 = (mx - 0.4 * ny * zz) / (0.4 * ar * ab * fy * zz) + (mz - 0.4 * ny * zx) / (0.4 * ar * ab * fy * zx)
+
+    if vx == 0:
+        vx = 0.3 * ny
+
+    if vz == 0:
+        vz = 0.3 * ny
+        mx = 0.4 * ny * zz
+
     as3 = (vx - 0.3 * ny) / (ar * av * fy) + (vz - 0.3 * ny) / (ar * av * fy) + (mx - 0.4 * ny * zz) / (
             1.3 * ar * ab * fy * zz)
     as4 = (mx - 0.4 * ny * zz) / (0.4 * ar * ab * fy * zz)

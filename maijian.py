@@ -395,7 +395,7 @@ if ny >= 0:  # 受拉工况校核
 
 if ny < 0:  # 受压工况校核
     ny = -ny  # 临时将负数的压力转为正值，用于计算
-    if mx < 0.4 * ny * zz:
+    if 0 < mx < 0.4 * ny * zz:
         calc_book.add_paragraph('根据规范', style='Normal')
         mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz1')
@@ -405,7 +405,7 @@ if ny < 0:  # 受压工况校核
         width = add_image(mathtemp, 'mnz2')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
         mx = 0.4 * ny * zz
-    if mz < 0.4 * ny * zx:
+    if 0 < mz < 0.4 * ny * zx:
         calc_book.add_paragraph('根据规范', style='Normal')
         mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz3')
@@ -415,6 +415,14 @@ if ny < 0:  # 受压工况校核
         width = add_image(mathtemp, 'mnz4')
         calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
         mz = 0.4 * ny * zx
+
+    if vx == 0:
+        vx = 0.3 * ny
+        mz = 0.4 * ny * zx
+    if vz == 0:
+        vz = 0.3 * ny
+        mx = 0.4 * ny * zz
+
     as3 = (vx - 0.3 * ny) / (ar * av * fy) + (vz - 0.3 * ny) / (ar * av * fy) + (mx - 0.4 * ny * zz) / (
             1.3 * ar * ab * fy * zz) + (mz - 0.4 * ny * zx) / (1.3 * ar * ab * fy * zx)
     as4 = (mx - 0.4 * ny * zz) / (0.4 * ar * ab * fy * zz) + (mz - 0.4 * ny * zx) / (0.4 * ar * ab * fy * zx)
