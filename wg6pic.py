@@ -17,8 +17,7 @@ from math import ceil
 from os import mkdir
 from os.path import exists
 
-
-print('外挂支持8工况应力云图自动提取到word初始版')
+print('外挂支撑8工况应力云图自动提取到word初始版')
 print('')
 print('20200525 by 徐明')
 print('')
@@ -127,7 +126,7 @@ calc_book.add_paragraph('外挂架模型', style='No Spacing')
 calc_book.add_paragraph('', style='Normal')
 calc_book.add_paragraph('8种工况示意图', style='No Spacing')
 
-for i in range(1,8):
+for i in range(1, 9):
     calc_book.add_heading(f'{titlist}.{i}.工况{i}', level=3)
     calc_book.add_paragraph('外挂架X向最大挠度00mm，Y向最大挠度00mm，Z向最大挠度00mm:', style='Normal')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/{picnum}.png', height=Cm(7))
@@ -153,8 +152,3 @@ filename = f'{titlist}外挂支撑系统' + strftime("%Y-%m-%d-%H%M%S", localtim
 calc_book.save(f'{filename}.docx')
 print(f'计算书生成结束，保存在程序目录下，文件名为{filename}.docx')
 input('按回车键退出......')
-
-
-
-
-

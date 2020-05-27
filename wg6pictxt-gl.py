@@ -18,7 +18,7 @@ from os import mkdir
 from os.path import exists
 import pandas as pd
 
-print('外挂支撑8工况应力云图自动提取到word强化版')
+print('内爬钢梁8工况应力云图自动提取到word强化版')
 print('[可读取TheResult.txt结果]')
 print('20200527 by 徐明')
 print('')
@@ -117,14 +117,14 @@ calc_book.core_properties.modified = datetime.utcnow()
 # calc_book.add_paragraph('采用大型通用有限元软件ANSYS按“三、外挂支撑系统图纸”建模，按“二、结构反力”加载分析', style='Normal')
 # calc_book.add_paragraph('取塔机吊臂旋转每隔45度为一个工况，分析8种工况。', style='Normal')
 
-titlist = '4.4'
-picpath = '1250-2'
-picnum = 1250000
-skiplist = [0, 1, 2, 25, 26, 49, 50, 73, 74, 97, 98, 121, 122, 145, 146, 169, 170,
-            193, 194, 195, 218, 219, 242, 243, 266]
+titlist = '4.5'
+picpath = '850-gl'
+picnum = 850000
+skiplist = [0, 1, 2, 15, 16, 29, 30, 43, 44, 57, 58, 71, 72, 85, 86, 99, 100,
+            113, 114, 115, 128, 129, 142, 143, 156]
 ansys = pd.read_table(f'{picpath}/TheResult.txt', sep='|', skiprows=skiplist, header=None)
 # print(ansys)
-tabindex = 10
+tabindex = 4
 
 # calc_book.add_heading(f'{titlist}.ZSL850外挂支撑系统', level=2)
 # calc_book.add_paragraph('', style='Normal')
@@ -151,44 +151,28 @@ for i in range(1, 9):
     min3 = ansys.iloc[tabindex + 5, 1]
     min3 = abs(min3)
     outnum3 = max(max3, min3)
-    calc_book.add_paragraph(f'外挂架X向最大挠度{ceil(outnum1)}mm，Y向最大挠度{ceil(outnum2)}mm，Z向最大挠度{ceil(outnum3)}mm:',
+    calc_book.add_paragraph(f'钢梁X向最大挠度{ceil(outnum1)}mm，Y向最大挠度{ceil(outnum2)}mm，Z向最大挠度{ceil(outnum3)}mm:',
                             style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/{picnum}.png', height=Cm(7))
     picnum = picnum + 1
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/{picnum}.png', height=Cm(7))
     picnum = picnum + 1
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/{picnum}.png', height=Cm(7))
     picnum = picnum + 1
     max4 = ansys.iloc[tabindex + 6, 1]
     max4 = abs(max4)
     min4 = ansys.iloc[tabindex + 7, 1]
     min4 = abs(min4)
     outnum4 = max(max4, min4)
-    calc_book.add_paragraph(f'主梁最大Mises应力{ceil(outnum4)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph(f'钢梁最大Mises应力{ceil(outnum4)}MPa:', style='Normal')
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/{picnum}.png', height=Cm(7))
     picnum = picnum + 1
-    max5 = ansys.iloc[tabindex + 8, 1]
-    max5 = abs(max5)
-    min5 = ansys.iloc[tabindex + 9, 1]
-    min5 = abs(min5)
-    outnum5 = max(max5, min5)
-    calc_book.add_paragraph(f'竖向撑杆最大Mises应力{ceil(outnum5)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
-    picnum = picnum + 1
-    max6 = ansys.iloc[tabindex + 10, 1]
-    max6 = abs(max6)
-    min6 = ansys.iloc[tabindex + 11, 1]
-    min6 = abs(min6)
-    outnum6 = max(max6, min6)
-    calc_book.add_paragraph(f'水平撑杆最大Mises应力{ceil(outnum6)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picpath}/ZSL{picnum}.png', height=Cm(7))
-    picnum = picnum + 1
-    tabindex = tabindex + 22  # 关键
+    tabindex = tabindex + 12  # 关键
 
 '''
 计算书结束，输出docx文档
 '''
-filename = f'{titlist}外挂支撑系统' + strftime("%Y-%m-%d-%H%M%S", localtime())
+filename = f'{titlist}内爬钢梁' + strftime("%Y-%m-%d-%H%M%S", localtime())
 calc_book.save(f'{filename}.docx')
 print(f'计算书生成结束，保存在程序目录下，文件名为{filename}.docx')
 # input('按回车键退出......')

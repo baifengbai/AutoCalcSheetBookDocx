@@ -5,3 +5,4 @@
 * yagan.py 校核压杆稳定，不考虑杆件自重
 * yagan-input.py 使用用户输入参数，校核压杆稳定，不考虑杆件自重
 * wg6pictxt.py 为wg6pic.py的加强版，外挂结果图片和数据同时提取到word
+* wg6pictxt-gl.py 为修改版本，适用与内爬钢梁的结果提取
