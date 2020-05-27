@@ -38,7 +38,7 @@ def add_image(latex, pngname):
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
 
-
+# 推荐使用yagan-input.py
 print('杆件稳定性校核自动生成word初始版')
 print('')
 print('20200525 by 徐明')
