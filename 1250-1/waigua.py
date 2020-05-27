@@ -131,7 +131,7 @@ while True:
 picnum = int(jobname * 1000)
 skiplist = [0, 1, 2, 25, 26, 49, 50, 73, 74, 97, 98, 121, 122, 145, 146, 169, 170,
             193, 194, 195, 218, 219, 242, 243, 266]
-ansys = pd.read_table(f'TheResult.txt', sep='|', skiprows=skiplist, header=None)
+ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
 # print(ansys)
 tabindex = 10
 
@@ -231,7 +231,7 @@ for row in mytable.rows:
 
 calc_book.add_paragraph('', style='Normal')
 calc_book.add_paragraph('杆件轴力包络值', style='Normal')
-mytable2 = calc_book.add_table(rows=5, cols=3, style='Table Grid')
+mytable2 = calc_book.add_table(rows=5, cols=2, style='Table Grid')
 mytable2.alignment = WD_TABLE_ALIGNMENT.CENTER
 mytable2.autofit = False
 mytable2.cell(0, 0).text = '名称'
@@ -254,7 +254,7 @@ mytable2.cell(4, 0).text = '竖向撑杆2'
 mytable2.cell(4, 1).text = str(ceil(ansys.iloc[9 + 10 * 22, 1]))
 
 # 设置单元格格式
-for c in range(3):
+for c in range(2):
     for cell in mytable2.columns[c].cells:
         cell.width = Cm(3.5)
         cell.paragraphs[0].paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
