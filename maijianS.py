@@ -283,12 +283,12 @@ if vz > 0:
     calc_book.add_paragraph(f'沿z向剪力作用方向最外层锚筋中心线之间的距离：{zz}mm', style='Normal')
 if vl > 0:
     calc_book.add_paragraph(f'剪力作用点距离锚板平面的距离：L={vl}mm', style='Normal')
-if vx > 0:
+if mz > 0:
     calc_book.add_paragraph('x向剪力产生的弯矩：', style='Normal')
     mathtemp = r'M_z = V_x L =' + str(mz) + r'(N \cdot mm)'
     width = add_image(mathtemp, 'mz')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mz.png', width=Inches(width))
-if vz > 0:
+if mx > 0:
     calc_book.add_paragraph('z向剪力产生的弯矩：', style='Normal')
     mathtemp = r'M_x = V_z L =' + str(mx) + r'(N \cdot mm)'
     width = add_image(mathtemp, 'mx')
