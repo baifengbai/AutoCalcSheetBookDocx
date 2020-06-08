@@ -17,3 +17,4 @@
 * wg6pictxt.py 为wg6pic.py的加强版，外挂结果图片和数据同时提取到word
 * wg6pictxt-gl.py 为修改版本，适用与内爬钢梁的结果提取
 * waigua.py 初次完成版，可以实现既定文件格式前提下计算书的自动生成
+* WindLoad 风载校核计算
