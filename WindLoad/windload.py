@@ -15,6 +15,9 @@ from docx.enum.text import WD_LINE_SPACING
 from math import ceil
 from os import mkdir
 from os.path import exists
+from math import cos
+from math import sin
+from math import radians
 
 print('======================================')
 print('塔机抗风稳定校核计算书word生成器')
@@ -26,6 +29,7 @@ print('计算书开始生成……')
 path = 'images'
 if not exists(path):
     mkdir(path)
+
 
 # 插入公式图片函数，参数1公式字符串，参数2公式图片的名称，返回值为公式图片的原始英寸宽度
 def add_image(latex, pngname):
@@ -47,13 +51,13 @@ print('文档格式初始化……')
 # 创建文档对象
 calc_book = Document()
 # 设置正文字体
-calc_book.styles['Normal'].font.name = 'Italic'
+calc_book.styles['Normal'].font.name = 'Times New Roman'
 calc_book.styles['Normal'].element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
 calc_book.styles['Normal'].font.size = Pt(12)
 calc_book.styles['Normal'].font.color.rgb = RGBColor(0x00, 0x00, 0x00)
 calc_book.styles['Normal'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 # 首行缩进，字符宽度等于字符高度，12pt=4.23mm, 1pt=0.3527mm
-calc_book.styles['Normal'].paragraph_format.first_line_indent = Mm(8.46)
+calc_book.styles['Normal'].paragraph_format.first_line_indent = Mm(0)
 calc_book.styles['Normal'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
 calc_book.styles['Normal'].paragraph_format.space_before = Mm(0)
 calc_book.styles['Normal'].paragraph_format.space_after = Mm(0)
@@ -63,11 +67,11 @@ calc_book.styles['No Spacing'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNME
 calc_book.styles['No Spacing'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
 calc_book.styles['No Spacing'].paragraph_format.space_before = Mm(0)
 calc_book.styles['No Spacing'].paragraph_format.space_after = Mm(0)
-# 增加一个右对齐的样式
+# 增加一个左对齐的样式
 calc_book.styles['Quote'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
-calc_book.styles['Quote'].font.name = 'Italic'
+calc_book.styles['Quote'].font.name = 'Times New Roman'
 calc_book.styles['Quote'].element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
-calc_book.styles['Quote'].font.size = Pt(12)
+calc_book.styles['Quote'].font.size = Pt(10)
 calc_book.styles['Quote'].font.italic = False
 calc_book.styles['Quote'].font.color.rgb = RGBColor(0x00, 0x00, 0x00)
 calc_book.styles['Quote'].paragraph_format.space_before = Mm(0)
@@ -89,7 +93,36 @@ calc_book.styles['Heading 1'].paragraph_format.keep_with_next = True
 calc_book.styles['Heading 1'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
 calc_book.styles['Heading 1'].paragraph_format.space_before = Mm(0)
 calc_book.styles['Heading 1'].paragraph_format.space_after = Mm(0)
-
+# 设置标题2字体
+calc_book.styles['Heading 2'].font.name = 'Times New Roman'
+calc_book.styles['Heading 2'].element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
+calc_book.styles['Heading 2'].element.rPr.rFonts.set(qn('w:asciiTheme'), 'Times New Roman')
+calc_book.styles['Heading 2'].element.rPr.rFonts.set(qn('w:eastAsiaTheme'), '微软雅黑')
+calc_book.styles['Heading 2'].element.rPr.rFonts.set(qn('w:hAnsiTheme'), 'Times New Roman')
+calc_book.styles['Heading 2'].element.rPr.rFonts.set(qn('w:cstheme'), 'Times New Roman')
+calc_book.styles['Heading 2'].font.size = Pt(18)
+calc_book.styles['Heading 2'].font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+calc_book.styles['Heading 2'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+calc_book.styles['Heading 2'].paragraph_format.first_line_indent = Mm(0)
+calc_book.styles['Heading 2'].paragraph_format.keep_with_next = True
+calc_book.styles['Heading 2'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+calc_book.styles['Heading 2'].paragraph_format.space_before = Mm(0)
+calc_book.styles['Heading 2'].paragraph_format.space_after = Mm(0)
+# 设置标题3字体
+calc_book.styles['Heading 3'].font.name = 'Times New Roman'
+calc_book.styles['Heading 3'].element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
+calc_book.styles['Heading 3'].element.rPr.rFonts.set(qn('w:asciiTheme'), 'Times New Roman')
+calc_book.styles['Heading 3'].element.rPr.rFonts.set(qn('w:eastAsiaTheme'), '微软雅黑')
+calc_book.styles['Heading 3'].element.rPr.rFonts.set(qn('w:hAnsiTheme'), 'Times New Roman')
+calc_book.styles['Heading 3'].element.rPr.rFonts.set(qn('w:cstheme'), 'Times New Roman')
+calc_book.styles['Heading 3'].font.size = Pt(14)
+calc_book.styles['Heading 3'].font.color.rgb = RGBColor(0x00, 0x00, 0x00)
+calc_book.styles['Heading 3'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+calc_book.styles['Heading 3'].paragraph_format.first_line_indent = Mm(0)
+calc_book.styles['Heading 3'].paragraph_format.keep_with_next = True
+calc_book.styles['Heading 3'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+calc_book.styles['Heading 3'].paragraph_format.space_before = Mm(0)
+calc_book.styles['Heading 3'].paragraph_format.space_after = Mm(0)
 '''
 计算书文档属性设置
 '''
@@ -116,16 +149,59 @@ calc_book.core_properties.modified = datetime.utcnow()
 '''
 参数定义
 '''
+# 计算书名称
+jobname = '大疆ZSL1150抗风计算书'
+
 # 非工作10m高处基本风压
 pn = 1000
 # 塔机最高处的计算高度
 ht = 220
 # 风压高度变化系数, 保留两位小数
-kh = round(((((ht/10)**0.14)+0.4)/1.4)**2, 2)
+kh = round(((((ht / 10) ** 0.14) + 0.4) / 1.4) ** 2, 2)
 
-
-
+# 抗台风计算风压指定值
+pnh = 1870
+# 吊臂长度
+beam_len = 58.5
+# 非工作吊臂仰角
+beam_ang = 60
+# 塔机总力矩
+tower_m = 1488
+# 塔机后倾平衡力矩
+tower_back = - ceil(tower_m * 0.45)
+# 吊臂0度力矩
+beam_0 = 702
+# 吊臂非工作状态前倾力矩
+beam_m = ceil(beam_0 * cos(radians(beam_ang)))
+# 钩头重量
+hook_mass = 1.3
+# 钩头产生的前倾力矩
+hook_m = ceil(hook_mass * beam_len * cos(radians(beam_ang)))
+# 非工作状态下，上部结构不平衡
+m0 = tower_back + beam_m + hook_m
 
 '''
 文档生成
 '''
+calc_book.add_heading('2.1 无风状态塔机上部结构不平衡力矩', level=2)
+calc_book.add_paragraph(f'吊臂长度：{beam_len}m', style='Normal')
+calc_book.add_paragraph(f'非工作状态吊臂仰角：{beam_ang}°', style='Normal')
+calc_book.add_paragraph(f'塔机后倾平衡力矩：{tower_back}t.m', style='Normal')
+calc_book.add_paragraph(f'吊臂{beam_ang}°产生的前倾力矩：{beam_m}t.m', style='Normal')
+calc_book.add_paragraph(f'钩头产生的前倾力矩：{hook_m}t.m', style='Normal')
+calc_book.add_paragraph(f'非工作状态下塔机上部结构总不平衡力矩：M={tower_back}t.m+{beam_m}t.m+{hook_m}t.m={m0}t.m', style='Normal')
+calc_book.add_paragraph('*为便于计算，规定由回转中心朝吊臂方向弯矩为正，由回转中心朝配重块方向弯矩为负。', style='Quote')
+
+calc_book.add_heading('2.1 非工作状态风载荷', level=2)
+mathtemp = r'F_{WN} = p_n(h) \times C \times A'
+width = add_image(mathtemp, 'fwn')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fwn.png', width=Inches(width))
+
+
+
+'''
+计算书结束，输出docx文档
+'''
+filename = f'{jobname}' + strftime("%Y-%m-%d-%H%M%S", localtime())
+calc_book.save(f'{filename}.docx')
+print(f'计算书生成结束，保存在程序目录下，文件名为{filename}.docx')
