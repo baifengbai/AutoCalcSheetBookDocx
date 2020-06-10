@@ -57,6 +57,7 @@ calc_book.styles['Normal'].font.size = Pt(12)
 calc_book.styles['Normal'].font.color.rgb = RGBColor(0x00, 0x00, 0x00)
 calc_book.styles['Normal'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 # 首行缩进，字符宽度等于字符高度，12pt=4.23mm, 1pt=0.3527mm
+font_height = 4.23
 calc_book.styles['Normal'].paragraph_format.first_line_indent = Mm(0)
 calc_book.styles['Normal'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
 calc_book.styles['Normal'].paragraph_format.space_before = Mm(0)
@@ -196,6 +197,26 @@ calc_book.add_heading('2.1 非工作状态风载荷', level=2)
 mathtemp = r'F_{WN} = p_n(h) \times C \times A'
 width = add_image(mathtemp, 'fwn')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fwn.png', width=Inches(width))
+calc_book.add_paragraph('式中：', style='Normal')
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'F_{WN}'
+width = add_image(mathtemp, 'fwn1')
+para1.add_run('').add_picture(f'{path}/fwn1.png', height=Mm(font_height))  # Inches(width))
+para1.add_run('——非工作状态垂直作用在所指构件纵轴线上的风载荷，单位为牛顿')
+mathtemp = r'(N)'
+width = add_image(mathtemp, 'N')
+para1.add_run('').add_picture(f'{path}/N.png', height=Mm(font_height))  # Inches(width))
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'p_n(h)'
+width = add_image(mathtemp, 'pnh')
+para1.add_run('').add_picture(f'{path}/pnh.png', height=Mm(font_height))  # Inches(width))
+para1.add_run('——高度h处的非工作状态计算风压，单位为牛顿每平方米')
+mathtemp = r'(N/m^2)'
+width = add_image(mathtemp, 'Nm2')
+para1.add_run('').add_picture(f'{path}/Nm2.png', height=Mm(font_height))  # Inches(width))
+
+
 
 
 
