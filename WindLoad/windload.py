@@ -47,6 +47,20 @@ def add_image(latex, pngname):
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
 
+# 插入公式图片函数，参数1公式字符串，参数2公式图片的名称，返回值为公式图片的高度mm
+def add_image2(latex, pngname):
+    math = urllib.parse.quote(latex)
+    query_url = 'http://latex.xuming.science/latex-image.php?math=' + math
+    try:
+        chart = urllib.request.urlopen(query_url)
+        f = open(f'{path}/{pngname}.png', 'wb')
+        f.write(chart.read())
+        f.close()
+        img = Image.open(f'{path}/{pngname}.png')
+        return img.size[1] * 25.4 / 96
+    except:
+        print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
+        return 0
 
 print('文档格式初始化……')
 # 创建文档对象
@@ -197,7 +211,7 @@ beam_a = beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001  # 特�
 beam_phi = beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang)))  # 充实率
 wind_v = (pnh / 0.625) ** 0.5  # 通过风压反推风速
 re = 0.667 * wind_v * beam_d1 * 0.001  # 单位10^5
-
+beam_lambda = round(beam_len * sin(radians(beam_ang)) / (beam_b + beam_d1 * 0.001), 1)
 '''
 文档生成
 '''
@@ -269,15 +283,17 @@ para1 = calc_book.add_paragraph('充实率', style='Normal')
 mathtemp = r'\varphi = ' + str(round(beam_phi, 2))
 add_image(mathtemp, 'beamphi')
 para1.add_run('').add_picture(f'{path}/beamphi.png', height=Mm(font_height))
+print(f'充实率为{round(beam_phi, 2)}')
 
 para1 = calc_book.add_paragraph('雷诺数', style='Normal')
 mathtemp = r'Re = ' + str(round(re, 2)) + r'\times 10^5'
 add_image(mathtemp, 're')
 para1.add_run('').add_picture(f'{path}/re.png', height=Mm(font_height))
+print(f'雷诺数为{round(re, 2)}x10^5')
 
 while True:
     try:
-        beam_c0 = float(input("查表得吊臂的空气动力系数C0: "))
+        beam_c0 = float(input("根据图B8b,得吊臂的空气动力系数C0: "))
         break
     except ValueError:
         print("输入错误，请输入正确数据")
@@ -289,6 +305,71 @@ para1.add_run('').add_picture(f'{path}/beam_c0.png', height=Mm(font_height))
 
 calc_book.add_paragraph('表B.5  平面和空间格构式构件的特征面积和空气动力系数', style='No Spacing')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B5.png', height=Cm(11.5))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B8.png', height=Cm(4.6))
+calc_book.add_paragraph('图B.8b 单根构件为圆形的空间格构式构件，其空气动力系数与雷诺数和充实率的关系', style='No Spacing')
+
+calc_book.add_paragraph('吊臂的空气动力长细比：', style='Normal')
+mathtemp = r'\lambda = \frac{l_a}{d} = \frac{' + str(round(beam_len * sin(radians(beam_ang)), 1)) + '}{' + str(
+    beam_b + beam_d1 * 0.001) + '} = ' + str(beam_lambda)
+width = add_image(mathtemp, 'beam_lambda')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/beam_lambda.png', width=Inches(width))
+
+calc_book.add_paragraph('式中：', style='Normal')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'\lambda'
+add_image(mathtemp, 'lambda')
+para1.add_run('').add_picture(f'{path}/lambda.png', height=Mm(font_height))
+para1.add_run('——空气动力长细比')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = 'd'
+add_image(mathtemp, 'd')
+para1.add_run('').add_picture(f'{path}/d.png', height=Mm(font_height))
+para1.add_run('——构件的特征尺寸')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = 'l_a'
+add_image(mathtemp, 'la')
+para1.add_run('').add_picture(f'{path}/la.png', height=Mm(font_height))
+para1.add_run('——构件的空气动力长度，按下式计算')
+
+mathtemp = r'l_a = \alpha \times l = 1 \times' + str(beam_len) + r'\times sin(' + str(beam_ang) + r'^{\circ}) =' + str(
+    round(beam_len * sin(radians(beam_ang)), 1))
+width = add_image(mathtemp, 'la2')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/la2.png', width=Inches(width))
+
+calc_book.add_paragraph('式中：', style='Normal')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'l'
+add_image(mathtemp, 'l')
+para1.add_run('').add_picture(f'{path}/l.png', height=Mm(font_height))
+para1.add_run('——构件长度，即其两节点之间的距离')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'\alpha'
+height = add_image2(mathtemp, 'alpha')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/alpha.png', height=Mm(imgheight))
+para1.add_run('——相对空气动力长度，按《GB/T 13752-2017 塔式起重机设计规范》取1')
+
+print(f'充实率为{round(beam_phi, 2)}')
+print(f'空气动力长细比为{beam_lambda}')
+while True:
+    try:
+        beam_psi = float(input("根据图B1,得折减系数: "))
+        break
+    except ValueError:
+        print("输入错误，请输入正确数据")
+
+calc_book.add_paragraph('吊臂的空气动力系数：', style='Normal')
+mathtemp = r'C = C_0 \times \Psi = '+ str(beam_c0) +r'\times' + str(beam_psi) + r'=' + str(round(beam_c0 * beam_psi, 3))
+width = add_image(mathtemp, 'beam_c')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/beam_c.png', width=Inches(width))
 
 
 
