@@ -2,6 +2,7 @@ from docx import Document
 from docx.shared import Inches
 from docx.shared import Pt
 from docx.shared import Mm
+from docx.shared import Cm
 from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -62,12 +63,16 @@ calc_book.styles['Normal'].paragraph_format.first_line_indent = Mm(0)
 calc_book.styles['Normal'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
 calc_book.styles['Normal'].paragraph_format.space_before = Mm(0)
 calc_book.styles['Normal'].paragraph_format.space_after = Mm(0)
+
 # 增加一个居中显示的样式
 calc_book.styles['No Spacing'].paragraph_format.first_line_indent = Mm(0)
 calc_book.styles['No Spacing'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-calc_book.styles['No Spacing'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.ONE_POINT_FIVE
+calc_book.styles['No Spacing'].paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
 calc_book.styles['No Spacing'].paragraph_format.space_before = Mm(0)
 calc_book.styles['No Spacing'].paragraph_format.space_after = Mm(0)
+calc_book.styles['No Spacing'].font.size = Pt(10)
+calc_book.styles['No Spacing'].font.name = 'Times New Roman'
+calc_book.styles['No Spacing'].element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
 # 增加一个左对齐的样式
 calc_book.styles['Quote'].paragraph_format.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
 calc_book.styles['Quote'].font.name = 'Times New Roman'
@@ -189,8 +194,8 @@ beam_d2 = 70  # 腹杆直径mm
 beam_b = 2.25  # 主弦中心距m
 beam_fg_len = 1.27 * beam_len * 2  # 腹杆长度总和
 beam_a = beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001  # 特征面积
-beam_phi = beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang)))   # 充实率
-wind_v = (pnh / 0.625)**0.5   # 通过风压反推风速
+beam_phi = beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang)))  # 充实率
+wind_v = (pnh / 0.625) ** 0.5  # 通过风压反推风速
 re = 0.667 * wind_v * beam_d1 * 0.001  # 单位10^5
 
 '''
@@ -252,9 +257,38 @@ width = add_image(mathtemp, 'pnh1870')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/pnh1870.png', width=Inches(width))
 
 calc_book.add_heading('2.4 吊臂风载荷计算', level=2)
+calc_book.add_paragraph(f'吊臂为空间桁架结构，主弦采用直径{beam_d1}mm圆管，腹杆采用直径{beam_d2}mm圆管，主弦中心距为{beam_b}m，吊臂总长{beam_len}m。',
+                        style='Normal')
+calc_book.add_paragraph('根据《GB/T 13752-2017 塔式起重机设计规范》 表B.5序号3及图B.8b，可得：', style='Normal')
+para1 = calc_book.add_paragraph('特征面积', style='Normal')
+mathtemp = r'A = ' + str(ceil(beam_a)) + 'm^2'
+add_image(mathtemp, 'beama')
+para1.add_run('').add_picture(f'{path}/beama.png', height=Mm(font_height))
 
+para1 = calc_book.add_paragraph('充实率', style='Normal')
+mathtemp = r'\varphi = ' + str(round(beam_phi, 2))
+add_image(mathtemp, 'beamphi')
+para1.add_run('').add_picture(f'{path}/beamphi.png', height=Mm(font_height))
 
+para1 = calc_book.add_paragraph('雷诺数', style='Normal')
+mathtemp = r'Re = ' + str(round(re, 2)) + r'\times 10^5'
+add_image(mathtemp, 're')
+para1.add_run('').add_picture(f'{path}/re.png', height=Mm(font_height))
 
+while True:
+    try:
+        beam_c0 = float(input("查表得吊臂的空气动力系数C0: "))
+        break
+    except ValueError:
+        print("输入错误，请输入正确数据")
+
+para1 = calc_book.add_paragraph('空气动力系数', style='Normal')
+mathtemp = r'C_0 = ' + str(round(beam_c0, 2))
+add_image(mathtemp, 'beam_c0')
+para1.add_run('').add_picture(f'{path}/beam_c0.png', height=Mm(font_height))
+
+calc_book.add_paragraph('表B.5  平面和空间格构式构件的特征面积和空气动力系数', style='No Spacing')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B5.png', height=Cm(11.5))
 
 
 
