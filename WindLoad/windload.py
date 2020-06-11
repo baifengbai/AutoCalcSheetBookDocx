@@ -47,6 +47,7 @@ def add_image(latex, pngname):
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
 
+
 # 插入公式图片函数，参数1公式字符串，参数2公式图片的名称，返回值为公式图片的高度mm
 def add_image2(latex, pngname):
     math = urllib.parse.quote(latex)
@@ -61,6 +62,7 @@ def add_image2(latex, pngname):
     except:
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
+
 
 print('文档格式初始化……')
 # 创建文档对象
@@ -206,12 +208,14 @@ m0 = tower_back + beam_m + hook_m
 beam_d1 = 133  # 主弦直径mm
 beam_d2 = 70  # 腹杆直径mm
 beam_b = 2.25  # 主弦中心距m
+
 beam_fg_len = 1.27 * beam_len * 2  # 腹杆长度总和
 beam_a = beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001  # 特征面积
 beam_phi = beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang)))  # 充实率
 wind_v = (pnh / 0.625) ** 0.5  # 通过风压反推风速
 re = 0.667 * wind_v * beam_d1 * 0.001  # 单位10^5
 beam_lambda = round(beam_len * sin(radians(beam_ang)) / (beam_b + beam_d1 * 0.001), 1)
+
 '''
 文档生成
 '''
@@ -232,36 +236,64 @@ calc_book.add_paragraph('式中：', style='Normal')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'F_{WN}'
-add_image(mathtemp, 'fwn1')
-para1.add_run('').add_picture(f'{path}/fwn1.png', height=Mm(font_height))  # Inches(width))
+height = add_image2(mathtemp, 'fwn1')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/fwn1.png', height=Mm(imgheight))  # Inches(width))
 para1.add_run('——非工作状态垂直作用在所指构件纵轴线上的风载荷，单位为牛顿')
 mathtemp = r'(N)'
-add_image(mathtemp, 'N')
-para1.add_run('').add_picture(f'{path}/N.png', height=Mm(font_height))  # Inches(width))
+height = add_image2(mathtemp, 'N')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/N.png', height=Mm(imgheight))  # Inches(width))
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'p_n(h)'
-add_image(mathtemp, 'pnh')
-para1.add_run('').add_picture(f'{path}/pnh.png', height=Mm(font_height))  # Inches(width))
+height = add_image2(mathtemp, 'pnh')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/pnh.png', height=Mm(imgheight))  # Inches(width))
 para1.add_run('——高度h处的非工作状态计算风压，单位为牛顿每平方米')
 mathtemp = r'(N/m^2)'
-add_image(mathtemp, 'Nm2')
-para1.add_run('').add_picture(f'{path}/Nm2.png', height=Mm(font_height))  # Inches(width))
+height = add_image2(mathtemp, 'Nm2')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/Nm2.png', height=Mm(imgheight))  # Inches(width))
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'C'
-add_image(mathtemp, 'C')
-para1.add_run('').add_picture(f'{path}/C.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'C')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/C.png', height=Mm(imgheight))
 para1.add_run('——所指构件的空气动力系数，与构件的特征面积A一起使用')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'A'
-add_image(mathtemp, 'A')
-para1.add_run('').add_picture(f'{path}/A.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'A')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/A.png', height=Mm(imgheight))
 para1.add_run('——所指构件的特征面积，单位为平方米')
 mathtemp = r'(m^2)'
-add_image(mathtemp, 'm2')
-para1.add_run('').add_picture(f'{path}/m2.png', height=Mm(font_height))  # Inches(width))
+height = add_image2(mathtemp, 'm2')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/m2.png', height=Mm(imgheight))  # Inches(width))
 
 calc_book.add_heading('2.3 非工作状态计算风压', level=2)
 calc_book.add_paragraph(f'{tower_model}塔机非工作状态计算风压取深圳防台风技术规程5.1.3中最大风压1870Pa。', style='Normal')
@@ -276,19 +308,31 @@ calc_book.add_paragraph(f'吊臂为空间桁架结构，主弦采用直径{beam_
 calc_book.add_paragraph('根据《GB/T 13752-2017 塔式起重机设计规范》 表B.5序号3及图B.8b，可得：', style='Normal')
 para1 = calc_book.add_paragraph('特征面积', style='Normal')
 mathtemp = r'A = ' + str(ceil(beam_a)) + 'm^2'
-add_image(mathtemp, 'beama')
-para1.add_run('').add_picture(f'{path}/beama.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'beama')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/beama.png', height=Mm(imgheight))
 
 para1 = calc_book.add_paragraph('充实率', style='Normal')
 mathtemp = r'\varphi = ' + str(round(beam_phi, 2))
-add_image(mathtemp, 'beamphi')
-para1.add_run('').add_picture(f'{path}/beamphi.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'beamphi')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/beamphi.png', height=Mm(imgheight))
 print(f'充实率为{round(beam_phi, 2)}')
 
 para1 = calc_book.add_paragraph('雷诺数', style='Normal')
 mathtemp = r'Re = ' + str(round(re, 2)) + r'\times 10^5'
-add_image(mathtemp, 're')
-para1.add_run('').add_picture(f'{path}/re.png', height=Mm(font_height))
+height = add_image2(mathtemp, 're')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/re.png', height=Mm(imgheight))
 print(f'雷诺数为{round(re, 2)}x10^5')
 
 while True:
@@ -300,8 +344,12 @@ while True:
 
 para1 = calc_book.add_paragraph('空气动力系数', style='Normal')
 mathtemp = r'C_0 = ' + str(round(beam_c0, 2))
-add_image(mathtemp, 'beam_c0')
-para1.add_run('').add_picture(f'{path}/beam_c0.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'beam_c0')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/beam_c0.png', height=Mm(imgheight))
 
 calc_book.add_paragraph('表B.5  平面和空间格构式构件的特征面积和空气动力系数', style='No Spacing')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B5.png', height=Cm(11.5))
@@ -318,20 +366,32 @@ calc_book.add_paragraph('式中：', style='Normal')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'\lambda'
-add_image(mathtemp, 'lambda')
-para1.add_run('').add_picture(f'{path}/lambda.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'lambda')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/lambda.png', height=Mm(imgheight))
 para1.add_run('——空气动力长细比')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = 'd'
-add_image(mathtemp, 'd')
-para1.add_run('').add_picture(f'{path}/d.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'd')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/d.png', height=Mm(imgheight))
 para1.add_run('——构件的特征尺寸')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = 'l_a'
-add_image(mathtemp, 'la')
-para1.add_run('').add_picture(f'{path}/la.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'la')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/la.png', height=Mm(imgheight))
 para1.add_run('——构件的空气动力长度，按下式计算')
 
 mathtemp = r'l_a = \alpha \times l = 1 \times' + str(beam_len) + r'\times sin(' + str(beam_ang) + r'^{\circ}) =' + str(
@@ -343,12 +403,17 @@ calc_book.add_paragraph('式中：', style='Normal')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'l'
-add_image(mathtemp, 'l')
-para1.add_run('').add_picture(f'{path}/l.png', height=Mm(font_height))
+height = add_image2(mathtemp, 'l')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/l.png', height=Mm(imgheight))
 para1.add_run('——构件长度，即其两节点之间的距离')
 
 para1 = calc_book.add_paragraph('', style='Normal')
 mathtemp = r'\alpha'
+# 行内图片公式，使用图片高度和字体高度的较小值
 height = add_image2(mathtemp, 'alpha')
 if height > font_height:
     imgheight = font_height
@@ -367,9 +432,46 @@ while True:
         print("输入错误，请输入正确数据")
 
 calc_book.add_paragraph('吊臂的空气动力系数：', style='Normal')
-mathtemp = r'C = C_0 \times \Psi = '+ str(beam_c0) +r'\times' + str(beam_psi) + r'=' + str(round(beam_c0 * beam_psi, 3))
+mathtemp = r'C = C_0 \times \Psi = ' + str(beam_c0) + r'\times' + str(beam_psi) + r'=' + str(
+    round(beam_c0 * beam_psi, 3))
 width = add_image(mathtemp, 'beam_c')
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/beam_c.png', width=Inches(width))
+calc_book.add_paragraph('式中：', style='Normal')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'C_0'
+# 行内图片公式，使用图片高度和字体高度的较小值
+height = add_image2(mathtemp, 'c0')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/c0.png', height=Mm(imgheight))
+para1.add_run('——无限长直的等截面构件的空气动力系数')
+
+para1 = calc_book.add_paragraph('', style='Normal')
+mathtemp = r'\Psi'
+# 行内图片公式，使用图片高度和字体高度的较小值
+height = add_image2(mathtemp, 'psi')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/psi.png', height=Mm(imgheight))
+para1.add_run('——折减系数，为适合有限长构件而折减').add_picture(f'{path}/c0.png', height=Mm(imgheight))
+para1.add_run('。').add_picture(f'{path}/psi.png', height=Mm(imgheight))
+para1.add_run('与单根构件的空气动力长细比有关；如果是格构式构件，还与其充实率有关。按图B.1取值')
+mathtemp = r'\Psi =' + str(beam_psi)
+# 行内图片公式，使用图片高度和字体高度的较小值
+height = add_image2(mathtemp, 'psi2')
+if height > font_height:
+    imgheight = font_height
+else:
+    imgheight = height
+para1.add_run('').add_picture(f'{path}/psi2.png', height=Mm(imgheight))
+
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B1.png', height=Cm(7.2))
+calc_book.add_paragraph('图B.1 折减系数与空气动力长细比、结构充实率之间的关系', style='No Spacing')
 
 
 
