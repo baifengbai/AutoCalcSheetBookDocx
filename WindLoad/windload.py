@@ -43,7 +43,7 @@ def add_image(latex, pngname):
         f.close()
         img = Image.open(f'{path}/{pngname}.png')
         return img.size[0] / 96
-    except:
+    except IOError:
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
 
@@ -59,7 +59,7 @@ def add_image2(latex, pngname):
         f.close()
         img = Image.open(f'{path}/{pngname}.png')
         return img.size[1] * 25.4 / 96
-    except:
+    except IOError:
         print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
         return 0
 
@@ -210,11 +210,15 @@ beam_d2 = 70  # 腹杆直径mm
 beam_b = 2.25  # 主弦中心距m
 
 beam_fg_len = 1.27 * beam_len * 2  # 腹杆长度总和
-beam_a = beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001  # 特征面积
-beam_phi = beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang)))  # 充实率
+beam_a = ceil(beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001)  # 特征面积
+beam_phi = round(beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang))), 2) # 充实率
 wind_v = (pnh / 0.625) ** 0.5  # 通过风压反推风速
-re = 0.667 * wind_v * beam_d1 * 0.001  # 单位10^5
+re = round(0.667 * wind_v * beam_d1 * 0.001, 2)  # 单位10^5
 beam_lambda = round(beam_len * sin(radians(beam_ang)) / (beam_b + beam_d1 * 0.001), 1)
+
+beam_h = 44   # 吊臂风载作用中心高度m
+
+# A塔
 
 '''
 文档生成
@@ -307,7 +311,7 @@ calc_book.add_paragraph(f'吊臂为空间桁架结构，主弦采用直径{beam_
                         style='Normal')
 calc_book.add_paragraph('根据《GB/T 13752-2017 塔式起重机设计规范》 表B.5序号3及图B.8b，可得：', style='Normal')
 para1 = calc_book.add_paragraph('特征面积', style='Normal')
-mathtemp = r'A = ' + str(ceil(beam_a)) + 'm^2'
+mathtemp = r'A = ' + str(beam_a) + 'm^2'
 height = add_image2(mathtemp, 'beama')
 if height > font_height:
     imgheight = font_height
@@ -316,24 +320,24 @@ else:
 para1.add_run('').add_picture(f'{path}/beama.png', height=Mm(imgheight))
 
 para1 = calc_book.add_paragraph('充实率', style='Normal')
-mathtemp = r'\varphi = ' + str(round(beam_phi, 2))
+mathtemp = r'\varphi = ' + str(beam_phi)
 height = add_image2(mathtemp, 'beamphi')
 if height > font_height:
     imgheight = font_height
 else:
     imgheight = height
 para1.add_run('').add_picture(f'{path}/beamphi.png', height=Mm(imgheight))
-print(f'充实率为{round(beam_phi, 2)}')
+print(f'充实率为{beam_phi}')
 
 para1 = calc_book.add_paragraph('雷诺数', style='Normal')
-mathtemp = r'Re = ' + str(round(re, 2)) + r'\times 10^5'
+mathtemp = r'Re = ' + str(re) + r'\times 10^5'
 height = add_image2(mathtemp, 're')
 if height > font_height:
     imgheight = font_height
 else:
     imgheight = height
 para1.add_run('').add_picture(f'{path}/re.png', height=Mm(imgheight))
-print(f'雷诺数为{round(re, 2)}x10^5')
+print(f'雷诺数为{re}x10^5')
 
 while True:
     try:
@@ -343,7 +347,7 @@ while True:
         print("输入错误，请输入正确数据")
 
 para1 = calc_book.add_paragraph('空气动力系数', style='Normal')
-mathtemp = r'C_0 = ' + str(round(beam_c0, 2))
+mathtemp = r'C_0 = ' + str(beam_c0)
 height = add_image2(mathtemp, 'beam_c0')
 if height > font_height:
     imgheight = font_height
@@ -422,7 +426,7 @@ else:
 para1.add_run('').add_picture(f'{path}/alpha.png', height=Mm(imgheight))
 para1.add_run('——相对空气动力长度，按《GB/T 13752-2017 塔式起重机设计规范》取1')
 
-print(f'充实率为{round(beam_phi, 2)}')
+print(f'充实率为{beam_phi}')
 print(f'空气动力长细比为{beam_lambda}')
 while True:
     try:
@@ -472,6 +476,15 @@ para1.add_run('').add_picture(f'{path}/psi2.png', height=Mm(imgheight))
 
 calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture('lib/B1.png', height=Cm(7.2))
 calc_book.add_paragraph('图B.1 折减系数与空气动力长细比、结构充实率之间的关系', style='No Spacing')
+
+calc_book.add_paragraph('吊臂的风载：', style='Normal')
+beam_c = round(beam_c0 * beam_psi, 3)
+fw1 = pnh * beam_c * beam_a
+mathtemp = r'F_{W1} = p_n(h) \times C \times A ='+rf'{pnh} \times {beam_c} \times {beam_a}={ceil(fw1)}N={ceil(fw1/1000)}kN'
+width = add_image(mathtemp, 'fw1')
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fw1.png', width=Inches(width))
+
+
 
 
 
