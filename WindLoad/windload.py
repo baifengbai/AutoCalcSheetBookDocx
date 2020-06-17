@@ -172,9 +172,9 @@ calc_book.core_properties.modified = datetime.utcnow()
 参数定义
 '''
 # 计算书名称
-jobname = '大疆ZSL1150抗风计算书'
+jobname = 'ZSL750抗风计算书'
 # 塔机型号
-tower_model = 'ZSL1150'
+tower_model = 'ZSL750'
 # 非工作10m高处基本风压
 # pn = 1000
 # 塔机最高处的计算高度
@@ -188,13 +188,13 @@ pnh = 1870
 # 吊臂长度
 beam_len = 58.5
 # 非工作吊臂仰角
-beam_ang = 60
+beam_ang = 20
 # 塔机总力矩
-tower_m = 1488
+tower_m = 1231
 # 塔机后倾平衡力矩
 tower_back = - ceil(tower_m * 0.45)
 # 吊臂0度力矩
-beam_0 = 702
+beam_0 = 15.5 * 30.7
 # 吊臂非工作状态前倾力矩
 beam_m = ceil(beam_0 * cos(radians(beam_ang)))
 # 钩头重量
@@ -207,16 +207,16 @@ m0 = tower_back + beam_m + hook_m
 # 吊臂
 beam_d1 = 133  # 主弦直径mm
 beam_d2 = 70  # 腹杆直径mm
-beam_b = 2.25  # 主弦中心距m
+beam_b = 2  # 主弦中心距m
 
 beam_fg_len = 1.27 * beam_len * 2  # 腹杆长度总和
-beam_a = ceil(beam_len * 2 * beam_d1 * 0.001 + beam_fg_len * beam_d2 * 0.001)  # 特征面积
+beam_a = ceil(beam_len * 2 * beam_d1 * 0.001* sin(radians(beam_ang)) + beam_fg_len * beam_d2 * 0.001)  # 特征面积
 beam_phi = round(beam_a / (beam_len * (beam_b + beam_d1 * 0.001) * sin(radians(beam_ang))), 2) # 充实率
 wind_v = (pnh / 0.625) ** 0.5  # 通过风压反推风速
 re = round(0.667 * wind_v * beam_d1 * 0.001, 2)  # 单位10^5
 beam_lambda = round(beam_len * sin(radians(beam_ang)) / (beam_b + beam_d1 * 0.001), 1)
 
-beam_h = 44   # 吊臂风载作用中心高度m
+beam_h = 53.5   # 吊臂风载作用中心高度m
 
 # A塔
 
