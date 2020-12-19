@@ -7,7 +7,7 @@ from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 import urllib.parse
 import urllib.request
-from PIL import Image
+from PIL import Image, ImageChops
 from time import strftime
 from time import localtime
 from datetime import datetime
@@ -15,6 +15,17 @@ from docx.enum.text import WD_LINE_SPACING
 from math import ceil
 from os import mkdir
 from os.path import exists
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+
+config = {
+    "font.family":'serif',
+    "font.size": 20,
+    "mathtext.fontset":'stix',
+    "font.serif": ['SimSun'],
+}
+rcParams.update(config)
 
 print('======================================')
 print('墙体埋件计算书word生成器')
@@ -27,27 +38,36 @@ path = 'images'
 if not exists(path):
     mkdir(path)
 
+def trim(im2):
+    bg = Image.new(im2.mode, im2.size, im2.getpixel((0, 0)))
+    diff = ImageChops.difference(im2, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return im2.crop(bbox)
+
 
 # 插入公式图片函数，参数1公式字符串，参数2公式图片的名称，返回值为公式图片的原始英寸宽度
-def add_image(latex, pngname):
-    math = urllib.parse.quote(latex)
-    query_url = 'http://latex.xuming.science/latex-image.php?math=' + math
-    try:
-        chart = urllib.request.urlopen(query_url)
-        f = open(f'{path}/{pngname}.png', 'wb')
-        f.write(chart.read())
-        f.close()
-        img = Image.open(f'{path}/{pngname}.png')
-        return img.size[0] / 96
-    except:
-        print('无法连接公式服务器，请检查网络连接或向软件作者提交问题')
-        return 0
-    # chart = urllib.request.urlopen(query_url)
-    # f = open(f"{pngname}.png", "wb")
-    # f.write(chart.read())
-    # f.close()
-    # img = Image.open(f"{pngname}.png")
-    # return img.size[0] / 96
+def add_image(latex, jpgname):
+    fig = plt.figure(figsize=(20, 10), dpi=300)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    str_latex = '$'+latex+'$'
+    plt.text(0.5, 0.5, str_latex, fontsize=4.5, verticalalignment='center', horizontalalignment='center')
+    plt.axis('off')
+    plt.savefig(f'{path}/{jpgname}.jpg')
+    im = Image.open(f'{path}/{jpgname}.jpg')
+    im = trim(im)
+    im.save(f'{path}/{jpgname}.jpg')
+    return im.size[0] / 96
+
 
 
 print('文档格式初始化……')
@@ -272,7 +292,7 @@ if vx > 0:
     print('……', end=" ")
     mathtemp = r'V_x = ' + str(vx) + r'(N)'
     width = add_image(mathtemp, 'vx')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/vx.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/vx.jpg', width=Inches(width))
     calc_book.add_paragraph(f'沿x向剪力作用方向最外层锚筋中心线之间的距离：{zx}mm', style='Normal')
 
 if vz > 0:
@@ -280,7 +300,7 @@ if vz > 0:
     print('……', end=" ")
     mathtemp = r'V_z = ' + str(vz) + r'(N)'
     width = add_image(mathtemp, 'vz')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/vz.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/vz.jpg', width=Inches(width))
     calc_book.add_paragraph(f'沿z向剪力作用方向最外层锚筋中心线之间的距离：{zz}mm', style='Normal')
 if vl > 0:
     calc_book.add_paragraph(f'剪力作用点距离锚板平面的距离：L={vl}mm', style='Normal')
@@ -288,19 +308,19 @@ if mz > 0:
     calc_book.add_paragraph('x向剪力产生的弯矩：', style='Normal')
     mathtemp = r'M_z = V_x L =' + str(mz) + r'(N \cdot mm)'
     width = add_image(mathtemp, 'mz')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mz.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mz.jpg', width=Inches(width))
 if mx > 0:
     calc_book.add_paragraph('z向剪力产生的弯矩：', style='Normal')
     mathtemp = r'M_x = V_z L =' + str(mx) + r'(N \cdot mm)'
     width = add_image(mathtemp, 'mx')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mx.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mx.jpg', width=Inches(width))
 
 if ny >= 0:
     calc_book.add_paragraph('法向拉力设计值：', style='Normal')
     print('……', end=" ")
     mathtemp = r'N = ' + str(ny) + r'(N)'
     width = add_image(mathtemp, 'ny')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ny.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ny.jpg', width=Inches(width))
 
 if ny < 0:
     calc_book.add_paragraph('法向压力设计值：', style='Normal')
@@ -308,13 +328,13 @@ if ny < 0:
     nyplus = -ny
     mathtemp = r'N = ' + str(nyplus) + r'(N)'
     width = add_image(mathtemp, 'ny')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ny.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ny.jpg', width=Inches(width))
     calc_book.add_paragraph('根据规范，法向压力设计值应满足下式', style='Normal')
     print('……', end=" ")
     fca = 0.5 * fc * mbh * mbw
     mathtemp = r'N \leq 0.5 f_c A =' + str(ceil(fca)) + r'(N)'
     width = add_image(mathtemp, 'fca')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fca.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fca.jpg', width=Inches(width))
     if nyplus <= fca:
         calc_book.add_paragraph('满足规范要求。', style='Quote').add_run('')
     else:
@@ -324,62 +344,62 @@ calc_book.add_paragraph('锚筋的抗拉强度设计值：', style='Normal')
 print('……', end=" ")
 mathtemp = r'f_y = ' + str(fy) + r'(N/mm^2)'
 width = add_image(mathtemp, 'fy')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fy.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fy.jpg', width=Inches(width))
 
 calc_book.add_paragraph('混凝土轴心抗压强度设计值：', style='Normal')
 print('……', end=" ")
 mathtemp = r'f_c = ' + str(fc) + r'(N/mm^2)'
 width = add_image(mathtemp, 'fc')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fc.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/fc.jpg', width=Inches(width))
 
 calc_book.add_paragraph('混凝土轴心抗拉强度设计值：', style='Normal')
 print('……', end=" ")
 mathtemp = r'f_t = ' + str(ft) + r'(N/mm^2)'
 width = add_image(mathtemp, 'ft')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ft.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ft.jpg', width=Inches(width))
 
 calc_book.add_paragraph('锚筋层数的影响系数：', style='Normal')
 print('……', end=" ")
 # 插入公式图片开始
 mathtemp = r'\alpha_r = ' + str(ar)
 width = add_image(mathtemp, 'ar')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ar.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ar.jpg', width=Inches(width))
 # 插入公式图片结束
 
 calc_book.add_paragraph('锚筋的受剪承载力系数：', style='Normal')
 print('……', end=" ")
 # 插入公式图片开始
-mathtemp = r'\alpha_v = (4.0 - 0.08d) \sqrt{f_c \over f_y} = ' + str(round(av, 3))
+mathtemp = r'\alpha_v = (4.0 - 0.08d) \sqrt{\frac{f_c}{f_y}} = ' + str(round(av, 3))
 width = add_image(mathtemp, 'av')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/av.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/av.jpg', width=Inches(width))
 # 插入公式图片结束
 
 calc_book.add_paragraph('锚板的弯曲变形折减系数：', style='Normal')
 print('……', end=" ")
 mathtemp = r'\alpha_b = 0.6 + 0.25 \frac{t}{d} = ' + str(round(ab, 3))
 width = add_image(mathtemp, 'ab')
-calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ab.png', width=Inches(width))
+calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/ab.jpg', width=Inches(width))
 
 if ny >= 0:  # 受拉工况校核
     # if mx < 0.4 * ny * zz:   # 受拉工况不需要此步骤
     #     calc_book.add_paragraph('根据规范', style='Normal')
     #     mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
     #     width = add_image(mathtemp, 'mnz1')
-    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.jpg', width=Inches(width))
     #     calc_book.add_paragraph('取', style='Normal')
     #     mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
     #     width = add_image(mathtemp, 'mnz2')
-    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.jpg', width=Inches(width))
     #     mx = 0.4 * ny * zz
     # if mz < 0.4 * ny * zx:
     #     calc_book.add_paragraph('根据规范', style='Normal')
     #     mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
     #     width = add_image(mathtemp, 'mnz3')
-    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.png', width=Inches(width))
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.jpg', width=Inches(width))
     #     calc_book.add_paragraph('取', style='Normal')
     #     mathtemp = r'M_z = 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
     #     width = add_image(mathtemp, 'mnz4')
-    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
+    #     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.jpg', width=Inches(width))
     #     mz = 0.4 * ny * zx
     as1 = vx / (ar * av * fy) + vz / (ar * av * fy) + ny / (0.8 * ab * fy) + mx / (1.3 * ar * ab * fy * zz) + mz / (
             1.3 * ar * ab * fy * zx)
@@ -389,17 +409,17 @@ if ny >= 0:  # 受拉工况校核
     mathtemp = r'A_s \geq \frac{V}{\alpha_r \alpha_v f_y} + \frac{N}{0.8 \alpha_b f_y} ' \
                r'+ \frac{M}{1.3 \alpha_r \alpha_b f_y z}=' + str(ceil(as1)) + r'(mm^2)'
     width = add_image(mathtemp, 'as1')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as1.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as1.jpg', width=Inches(width))
     print('……', end=" ")
     mathtemp = r'A_s \geq \frac{N}{0.8 \alpha_b f_y} + \frac{M}{0.4 \alpha_r \alpha_b f_y z}=' + str(
         ceil(as2)) + r'(mm^2)'
     width = add_image(mathtemp, 'as2')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as2.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as2.jpg', width=Inches(width))
     calc_book.add_paragraph('锚筋实际总面积', style='Normal')
     print('……', end=" ")
     mathtemp = r'A_s =' + str(ceil(mjas)) + r'(mm^2)'
     width = add_image(mathtemp, 'as')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as.jpg', width=Inches(width))
     if mjas > as1 and mjas > as2:
         calc_book.add_paragraph('满足规范要求。', style='Quote')
     else:
@@ -411,11 +431,11 @@ if ny < 0:  # 受压工况校核
         calc_book.add_paragraph('根据规范', style='Normal')
         mathtemp = r'M_x =' + str(mx) + r'(N \cdot mm) < 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz1')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.png', width=Inches(width))
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz1.jpg', width=Inches(width))
         calc_book.add_paragraph('取', style='Normal')
         mathtemp = r'M_x = 0.4 N z_z =' + str(ceil(0.4 * ny * zz)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz2')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.png', width=Inches(width))
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz2.jpg', width=Inches(width))
         mx = 0.4 * ny * zz
     if mx == 0:
         mx = 0.4 * ny * zz
@@ -424,11 +444,11 @@ if ny < 0:  # 受压工况校核
         calc_book.add_paragraph('根据规范', style='Normal')
         mathtemp = r'M_z =' + str(mz) + r'(N \cdot mm) < 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz3')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.png', width=Inches(width))
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz3.jpg', width=Inches(width))
         calc_book.add_paragraph('取', style='Normal')
         mathtemp = r'M_z = 0.4 N z_x =' + str(ceil(0.4 * ny * zx)) + r'(N \cdot mm)'
         width = add_image(mathtemp, 'mnz4')
-        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.png', width=Inches(width))
+        calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/mnz4.jpg', width=Inches(width))
         mz = 0.4 * ny * zx
     if mz == 0:
         mz = 0.4 * ny * zx
@@ -445,16 +465,16 @@ if ny < 0:  # 受压工况校核
     mathtemp = r'A_s \geq \frac{V-0.3N}{\alpha_r \alpha_v f_y} + \frac{M-0.4Nz}{1.3 \alpha_r \alpha_b f_y z} =' + str(
         ceil(as3)) + r'(mm^2)'
     width = add_image(mathtemp, 'as3')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as3.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as3.jpg', width=Inches(width))
     print('……', end=" ")
     mathtemp = r'A_s \geq \frac{M-0.4Nz}{0.4 \alpha_r \alpha_b f_y z} =' + str(ceil(as4)) + r'(mm^2)'
     width = add_image(mathtemp, 'as4')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as4.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as4.jpg', width=Inches(width))
     calc_book.add_paragraph('锚筋实际总面积', style='Normal')
     print('……', end=" ")
     mathtemp = r'A_s =' + str(ceil(mjas)) + r'(mm^2)'
     width = add_image(mathtemp, 'as')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/as.jpg', width=Inches(width))
     if mjas > as3 and mjas > as4:
         calc_book.add_paragraph('满足规范要求。', style='Quote')
     else:
@@ -466,21 +486,21 @@ if ny >= 0:  # 受拉工况的锚固长度计算
     print('……', end=" ")
     mathtemp = r'\alpha = 0.14'
     width = add_image(mathtemp, 'alpha')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/alpha.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/alpha.jpg', width=Inches(width))
     calc_book.add_paragraph('基本锚固长度：', style='Normal')
     lab = 0.14 * fy * d / ft
     print('……', end=" ")
     mathtemp = r'l_{ab} = \alpha \frac{f_y}{f_t} d = ' + str(ceil(lab)) + '(mm)'
     width = add_image(mathtemp, 'lab')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lab.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lab.jpg', width=Inches(width))
     calc_book.add_paragraph('受拉钢筋的锚固长度限值：', style='Normal')
     mathtemp = r'l_{a} = \zeta_a l_{ab} = ' + str(ceil(lab * 1.1)) + '(mm)'
     width = add_image(mathtemp, 'la')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/la.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/la.jpg', width=Inches(width))
     calc_book.add_paragraph('上式中，锚固长度修正系数按规范取：', style='Normal')
     mathtemp = r'\zeta_a = ' + str(1.1)
     width = add_image(mathtemp, 'zeta')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/zeta.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/zeta.jpg', width=Inches(width))
     calc_book.add_paragraph('埋件处墙体厚度不满足锚固长度限值时采取双面锚板加强措施。', style='Normal')
 
 if ny < 0:  # 受压工况的锚固长度计算
@@ -488,7 +508,7 @@ if ny < 0:  # 受压工况的锚固长度计算
     calc_book.add_paragraph('受压钢筋的锚固长度限值：', style='Normal')
     mathtemp = r'l_{a} \geq 15d = ' + str(ceil(15 * d)) + '(mm)'
     width = add_image(mathtemp, 'lay')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lay.png', width=Inches(width))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/lay.jpg', width=Inches(width))
 
 print('……')
 '''

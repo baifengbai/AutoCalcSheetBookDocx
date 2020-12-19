@@ -3,8 +3,10 @@
     <words>
       <w>imgheight</w>
       <w>jobname</w>
+      <w>jpgname</w>
       <w>mathtemp</w>
       <w>mytable</w>
+      <w>pngname</w>
     </words>
   </dictionary>
 </component>

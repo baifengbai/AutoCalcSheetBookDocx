@@ -2,7 +2,15 @@ import matplotlib.pyplot as plt
 from os import mkdir
 from os.path import exists
 from PIL import Image, ImageChops
+from matplotlib import rcParams
 
+config = {
+    "font.family":'serif',
+    "font.size": 20,
+    "mathtext.fontset":'stix',
+    "font.serif": ['SimSun'],
+}
+rcParams.update(config)
 
 def trim(im2):
     bg = Image.new(im2.mode, im2.size, im2.getpixel((0, 0)))
@@ -26,14 +34,13 @@ def latex2png(str_latex, out_file, font_size=16):
     ax.set_yticks([])
     plt.text(0.5, 0.5, str_latex, fontsize=font_size, verticalalignment='center', horizontalalignment='center')
     plt.axis('off')
-    plt.savefig(out_file, bbox_inches=0, pad_inches=0)
+    plt.savefig(out_file)
 
 
 path = 'images'
 if not exists(path):
     mkdir(path)
-mathtemp = r'$F_{WN} = p_n(h) \times C \times A= p_n(h) \times C \times A= p_n(h) \times C \times A=' \
-           r' p_n(h) \times C \times A= p_n(h) \times C \times A= p_n(h) \times C \times A= p_n(h) \times C \times A=$'
+mathtemp = r'$\alpha_v = (4.0 - 0.08d) \sqrt{\frac{f_c}{f_y}} = 0.444$'
 latex2png(mathtemp, f'{path}/fwn.jpg', font_size=16)
 
 im = Image.open(f'{path}/fwn.jpg')
