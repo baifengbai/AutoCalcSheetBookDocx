@@ -16,6 +16,7 @@ from docx.enum.text import WD_LINE_SPACING
 from math import ceil
 # from os import mkdir
 # from os.path import exists
+import os
 import pandas as pd
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
@@ -112,6 +113,8 @@ calc_book.core_properties.created = datetime.utcnow()
 # 文档修改时间
 calc_book.core_properties.modified = datetime.utcnow()
 
+# 准确定义工作目录为文件所在目录
+os.chdir(os.path.dirname(__file__))
 '''
 计算书正文开始
 '''
@@ -131,6 +134,7 @@ while True:
 picnum = int(jobname * 1000)
 skiplist = [0, 1, 2, 25, 26, 49, 50, 73, 74, 97, 98, 121, 122, 145, 146, 169, 170,
             193, 194, 195, 218, 219, 242, 243, 266]
+
 ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
 # print(ansys)
 tabindex = 10
@@ -203,9 +207,10 @@ mytable = calc_book.add_table(rows=rows_num, cols=cols_num, style='Table Grid')
 mytable.alignment = WD_TABLE_ALIGNMENT.CENTER
 mytable.autofit = False
 
-skiplist = [0, 1, 2, 25, 26, 49, 50, 73, 74, 97, 98, 121, 122, 145, 146, 169, 170,
-            193, 194, 195, 218, 219, 242, 243, 266]
-ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
+# 下面两行代码重复
+# skiplist = [0, 1, 2, 25, 26, 49, 50, 73, 74, 97, 98, 121, 122, 145, 146, 169, 170,
+#             193, 194, 195, 218, 219, 242, 243, 266]
+# ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
 
 for r in range(8):
     mytable.cell(0 + r * 8, 0).text = f'工况-{r + 1}'
