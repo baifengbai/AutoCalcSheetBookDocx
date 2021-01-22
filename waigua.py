@@ -215,7 +215,7 @@ mytable.autofit = False
 for r in range(8):
     mytable.cell(0 + r * 8, 0).text = f'工况-{r + 1}'
     mytable.cell(1 + r * 8, 0).text = '节点'
-    mytable.cell(1 + r * 8, 1).text = 'F_X(t)'
+    mytable.cell(1 + r * 8, 1).text = 'F_x(t)'
     mytable.cell(1 + r * 8, 2).text = 'F_y(t)'
     mytable.cell(1 + r * 8, 3).text = 'F_z(t)'
     for i in range(6):
