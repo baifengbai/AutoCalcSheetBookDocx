@@ -33,7 +33,7 @@ rcParams.update(config)
 
 print('======================================')
 print('墙体埋件计算书word生成器')
-print('简化版本20200529 by 徐明')
+print('锚筋两向不同间距版本20210127 by 徐明')
 print('默认参数：fy=300；fc=19.1；ft=1.71')
 print('======================================')
 print('计算书开始生成……')
@@ -154,7 +154,7 @@ while True:
         print("输入错误，请输入正确的锚筋直径数字[整数]")
 
 # d = 28  # 锚筋直径，单位mm
-mj = f'HRB400-ø{d}'  # 锚筋规格
+mj = f'HRB335-ø{d}'  # 锚筋规格
 # while True:
 #     try:
 #         mjnums = int(input("锚筋数量: "))
@@ -186,10 +186,19 @@ while True:
 # mbw = 1008  # 锚板宽度，单位mm
 while True:
     try:
-        mjjj = int(input("锚筋间距(mm)[双向等间距]: "))
+        mjjjx = int(input("水平向锚筋间距(mm): "))
         break
     except ValueError:
         print("输入错误，请输入正确数据[整数]")
+
+while True:
+    try:
+        mjjjz = int(input("竖向锚筋间距(mm): "))
+        break
+    except ValueError:
+        print("输入错误，请输入正确数据[整数]")
+
+
 while True:
     try:
         xrow = int(input("水平锚筋排数: "))
@@ -254,8 +263,8 @@ while True:
     except ValueError:
         print("输入错误，请输入正确数据[整数]")
 # ny = 1618000  # 法向拉力（正）或法向压力（负），单位N
-zx = mjjj * (xrow - 1)  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
-zz = mjjj * (zrow - 1)  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zx = mjjjx * (xrow - 1)  # x向剪力作用方向最外层锚筋中心线之间的距离，单位mm
+zz = mjjjz * (zrow - 1)  # z向剪力作用方向最外层锚筋中心线之间的距离，单位mm
 row = max(xrow, zrow)  # 锚筋排数取大值
 
 while True:
@@ -505,7 +514,7 @@ if ny >= 0:  # 受拉工况的锚固长度计算
     mathtemp = r'\zeta_a = ' + str(1.1)
     width = add_image(mathtemp, 'zeta')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{path}/zeta.jpg', width=Inches(width))
-    calc_book.add_paragraph('埋件处墙体厚度不满足锚固长度限值时采取双面锚板加强措施。', style='Normal')
+    calc_book.add_paragraph('埋件处墙体厚度不满足锚固长度限值时采取双面锚板加强措施或采取搭接钢筋措施。', style='Normal')
 
 if ny < 0:  # 受压工况的锚固长度计算
     calc_book.add_paragraph('根据规范，受压直锚筋的锚固长度不应小于15d', style='Normal')
