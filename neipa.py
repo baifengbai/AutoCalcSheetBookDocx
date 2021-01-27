@@ -156,7 +156,7 @@ for i in range(1, 9):
     min3 = ansys.iloc[tabindex + 5, 1]
     min3 = abs(min3)
     outnum3 = max(max3, min3)
-    calc_book.add_paragraph(f'外挂架X向最大挠度{ceil(outnum1)}mm，Y向最大挠度{ceil(outnum2)}mm，Z向最大挠度{ceil(outnum3)}mm:',
+    calc_book.add_paragraph(f'内爬钢梁X向最大挠度{ceil(outnum1)}mm，Y向最大挠度{ceil(outnum2)}mm，Z向最大挠度{ceil(outnum3)}mm:',
                             style='Normal')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
     picnum = picnum + 1
@@ -169,7 +169,7 @@ for i in range(1, 9):
     min4 = ansys.iloc[tabindex + 7, 1]
     min4 = abs(min4)
     outnum4 = max(max4, min4)
-    calc_book.add_paragraph(f'主梁最大Mises应力{ceil(outnum4)}MPa:', style='Normal')
+    calc_book.add_paragraph(f'内爬钢梁最大Mises应力{ceil(outnum4)}MPa:', style='Normal')
     calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
     picnum = picnum + 1
     tabindex = tabindex + 12  # 关键
