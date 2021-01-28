@@ -5,28 +5,23 @@ from docx.shared import Mm
 from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-import urllib.parse
-import urllib.request
 from PIL import Image, ImageChops
 from time import strftime
 from time import localtime
 from datetime import datetime
 from docx.enum.text import WD_LINE_SPACING
 from math import ceil
-from os import mkdir
-from os.path import exists
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import os
-
 
 # 准确定义工作目录为文件所在目录
 os.chdir(os.path.dirname(__file__))
 
 config = {
-    "font.family":'serif',
+    "font.family": 'serif',
     "font.size": 20,
-    "mathtext.fontset":'stix',
+    "mathtext.fontset": 'stix',
     "font.serif": ['SimSun'],
 }
 rcParams.update(config)
@@ -39,8 +34,9 @@ print('======================================')
 print('计算书开始生成……')
 
 path = 'images'
-if not exists(path):
-    mkdir(path)
+if not os.path.exists(path):
+    os.mkdir(path)
+
 
 def trim(im2):
     bg = Image.new(im2.mode, im2.size, im2.getpixel((0, 0)))
@@ -63,7 +59,7 @@ def add_image(latex, jpgname):
     ax.spines['right'].set_visible(False)
     ax.set_xticks([])
     ax.set_yticks([])
-    str_latex = '$'+latex+'$'
+    str_latex = '$' + latex + '$'
     plt.text(0.5, 0.5, str_latex, fontsize=4.5, verticalalignment='center', horizontalalignment='center')
     plt.axis('off')
     plt.savefig(f'{path}/{jpgname}.jpg')
@@ -71,7 +67,6 @@ def add_image(latex, jpgname):
     im = trim(im)
     im.save(f'{path}/{jpgname}.jpg')
     return im.size[0] / 96
-
 
 
 print('文档格式初始化……')
@@ -197,7 +192,6 @@ while True:
         break
     except ValueError:
         print("输入错误，请输入正确数据[整数]")
-
 
 while True:
     try:
