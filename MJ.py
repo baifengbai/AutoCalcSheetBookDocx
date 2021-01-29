@@ -63,6 +63,8 @@ def add_image(latex, jpgname):
     plt.text(0.5, 0.5, str_latex, fontsize=4.5, verticalalignment='center', horizontalalignment='center')
     plt.axis('off')
     plt.savefig(f'{path}/{jpgname}.jpg')
+    plt.cla()
+    plt.close("all")
     im = Image.open(f'{path}/{jpgname}.jpg')
     im = trim(im)
     im.save(f'{path}/{jpgname}.jpg')
