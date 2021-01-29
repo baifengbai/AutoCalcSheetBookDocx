@@ -149,7 +149,15 @@ while True:
         print("输入错误，请输入正确的锚筋直径数字[整数]")
 
 # d = 28  # 锚筋直径，单位mm
-mj = f'HRB335-ø{d}'  # 锚筋规格
+
+while True:
+    try:
+        gjph = input("锚筋牌号(例如HRB335、HRB400): ")
+        break
+    except ValueError:
+        print("输入错误")
+
+mj = f'{gjph}-ø{d}'  # 锚筋规格
 # while True:
 #     try:
 #         mjnums = int(input("锚筋数量: "))
