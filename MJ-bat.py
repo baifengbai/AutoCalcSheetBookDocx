@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import os
 import pandas as pd
+import sys
+
 
 # 准确定义工作目录为文件所在目录
 os.chdir(os.path.dirname(__file__))
@@ -73,12 +75,17 @@ def add_image(latex, jpgname):
 
 
 # 2021-01-29 改进版：从excel表单中读取数据，批量生成计算书
-data = pd.read_excel('maijian.xlsx', sheet_name='Sheet1', usecols='A:M',
+try:
+    data = pd.read_excel('maijian.xlsx', sheet_name='Sheet1', usecols='A:M',
                      converters={'锚筋直径/mm': int, '锚筋牌号': str, '锚板厚度/mm': float, '锚板高度/mm': float,
                                  '锚板宽度/mm': float, '水平向锚筋间距/mm': float, '竖向锚筋间距/mm': float, '水平锚筋排数': int,
                                  '竖向锚筋排数': int, '水平向剪力/N': float, '竖向剪力/N': float, '法向拉(+)压(-)力/N': float,
                                  '剪力作用点距离锚板平面的距离/mm': float
                                  })
+except:
+    print('maijian.xlsx不在同目录下')
+    sys.exit()
+
 calc_num = data.shape[0]
 for calc_i in range(0, calc_num):
     # 创建文档对象
