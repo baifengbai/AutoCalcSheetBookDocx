@@ -19,7 +19,14 @@ print('外挂支撑8工况应力云图自动提取到word强化版--6杆轴力�
 print('[可读取TheResult.txt结果]')
 print('20210305 by 徐明')
 print('')
-
+'''
+TODO:
+1. 将图片结果提取设置成可选项
+2. 计算构件名称可选填（外挂架，支撑系统，底座梁等等）
+3. 单独组件应力图数量可选，组件名称可选填
+4. 节点反力数量可选，增加包络值可选
+5. 杆件轴力数量可选
+'''
 calc_book = Document()
 # 设置正文字体
 calc_book.styles['Normal'].font.name = 'Times New Roman'
