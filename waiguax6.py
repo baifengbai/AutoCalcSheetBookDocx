@@ -5,19 +5,20 @@ from docx.shared import Cm
 from docx.shared import RGBColor
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.text import WD_LINE_SPACING
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from time import strftime
 from time import localtime
 from datetime import datetime
-from docx.enum.text import WD_LINE_SPACING
 from math import ceil
 import os
 import pandas as pd
-from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
+import sys
 
 print('外挂支撑8工况应力云图自动提取到word强化版--6杆轴力版本')
 print('[可读取TheResult.txt结果]')
-print('20210305 by 徐明')
+print('20210309 by 徐明')
 print('')
 '''
 TODO:
@@ -26,6 +27,7 @@ TODO:
 3. 单独组件应力图数量可选，组件名称可选填
 4. 节点反力数量可选，增加包络值可选
 5. 杆件轴力数量可选
+6. 适配非全数字的jobname--已完成
 '''
 calc_book = Document()
 # 设置正文字体
@@ -113,6 +115,13 @@ calc_book.core_properties.comments = 'Designed By Xuming. All Rights Reserved.'
 calc_book.core_properties.created = datetime.utcnow()
 # 文档修改时间
 calc_book.core_properties.modified = datetime.utcnow()
+# 文档页边距设置
+sections = calc_book.sections
+for section in sections:
+    section.top_margin = Cm(2)
+    section.bottom_margin = Cm(2)
+    section.left_margin = Cm(2)
+    section.right_margin = Cm(2)
 
 # 准确定义工作目录为文件所在目录
 os.chdir(os.path.dirname(__file__))
@@ -127,18 +136,21 @@ titlist = input('输入上级二级标题编号[例如4.1，4.2，4.3等]: ')
 # titlist = '4.4'
 while True:
     try:
-        jobname = int(input('输入Job Name工作名[例如：850，1250，1500等]：'))
+        jobname = input('输入Job Name工作名[例如：850，L1250，ZSL1500，file等]：')
         break
     except ValueError:
-        print("输入错误，请输入正确的Job Name工作名[整数]")
+        print("请输入正确的Job Name工作名")
 
-picnum = int(jobname * 1000)
+picnum = 1000
 skiplist = [0, 1, 2, 27, 28, 53, 54, 79, 80, 105, 106, 131, 132, 157, 158, 183, 184,
             209, 210, 211, 236, 237, 262, 263, 288]
+try:
+    ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
+except ValueError:
+    print('目录下没有结果文件TheResult.txt')
+    sys.exit(0)
 
-ansys = pd.read_table('TheResult.txt', sep='|', skiprows=skiplist, header=None)
-# print(ansys)
-tabindex = 12
+tabindex = 12  # 计算书截图中数值索引
 
 # calc_book.add_heading(f'{titlist}.ZSL850外挂支撑系统', level=2)
 # calc_book.add_paragraph('', style='Normal')
@@ -167,11 +179,14 @@ for i in range(1, 9):
     outnum3 = max(max3, min3)
     calc_book.add_paragraph(f'外挂架X向最大挠度{ceil(outnum1)}mm，Y向最大挠度{ceil(outnum2)}mm，Z向最大挠度{ceil(outnum3)}mm:',
                             style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
     max4 = ansys.iloc[tabindex + 6, 1]
     max4 = abs(max4)
@@ -179,7 +194,8 @@ for i in range(1, 9):
     min4 = abs(min4)
     outnum4 = max(max4, min4)
     calc_book.add_paragraph(f'主梁最大Mises应力{ceil(outnum4)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
     max5 = ansys.iloc[tabindex + 8, 1]
     max5 = abs(max5)
@@ -187,7 +203,8 @@ for i in range(1, 9):
     min5 = abs(min5)
     outnum5 = max(max5, min5)
     calc_book.add_paragraph(f'竖向撑杆最大Mises应力{ceil(outnum5)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
     max6 = ansys.iloc[tabindex + 10, 1]
     max6 = abs(max6)
@@ -195,31 +212,42 @@ for i in range(1, 9):
     min6 = abs(min6)
     outnum6 = max(max6, min6)
     calc_book.add_paragraph(f'水平撑杆最大Mises应力{ceil(outnum6)}MPa:', style='Normal')
-    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{picnum}.png', height=Cm(7))
+    calc_book.add_paragraph('', style='No Spacing').add_run('').add_picture(f'{jobname + str(picnum)[1:]}.png',
+                                                                            height=Cm(7))
     picnum = picnum + 1
     tabindex = tabindex + 24  # 关键
 
 calc_book.add_heading(f'{titlist}.9.节点反力汇总', level=3)
 
-rows_num = 64
+# 表格大小设置
+rows_num = 64 + 8
 cols_num = 4
 
 mytable = calc_book.add_table(rows=rows_num, cols=cols_num, style='Table Grid')
 mytable.alignment = WD_TABLE_ALIGNMENT.CENTER
-mytable.autofit = False
+mytable.allow_autofit = False
 
-
-
-for r in range(8):
+for r in range(8):  # 8工况
     mytable.cell(0 + r * 8, 0).text = f'工况-{r + 1}'
     mytable.cell(1 + r * 8, 0).text = '节点'
     mytable.cell(1 + r * 8, 1).text = 'F_x(t)'
     mytable.cell(1 + r * 8, 2).text = 'F_y(t)'
     mytable.cell(1 + r * 8, 3).text = 'F_z(t)'
-    for i in range(6):
+    for i in range(6):  # 6节点
         mytable.cell(2 + i + r * 8, 0).text = str(int(ansys.iloc[i + r * 24, 0]))
-        for j in range(1, 4):
+        for j in range(1, 4):  # 三向反力
             mytable.cell(2 + i + r * 8, j).text = str(ansys.iloc[i + r * 24, j])
+
+# 节点反力包络值
+mytable.cell(0 + 64, 0).text = '包络值'
+mytable.cell(1 + 64, 0).text = '节点'
+mytable.cell(1 + 64, 1).text = 'F_x(t)'
+mytable.cell(1 + 64, 2).text = 'F_y(t)'
+mytable.cell(1 + 64, 3).text = 'F_z(t)'
+for i in range(6):  # 6节点
+    mytable.cell(2 + i + 64, 0).text = str(int(ansys.iloc[i + 10 * 24, 0]))
+    for j in range(1, 4):  # 三向反力
+        mytable.cell(2 + i + 64, j).text = str(ansys.iloc[i + 10 * 24, j])
 
 # 设置单元格格式
 for c in range(cols_num):
